@@ -29,3 +29,4 @@ class RuleGenerator:
         totalrule = combination(antecedent, mfs[2])
         return antecedent, totalrule
 
+
