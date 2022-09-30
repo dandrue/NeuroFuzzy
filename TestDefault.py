@@ -1,32 +1,28 @@
 from DefaultStructure import *
+from BackProp import *
 
 # Temperature input variable
-tVar = FuzzyVariable(name="Temp", rang=[100, 340])
-Temperatura = list(tVar.functions.values())
+tVar = FuzzyVariable(name="Temperature", rang=[100, 340], labels=["Fria", "Fresca", "Normal", "Tibia", "Caliente"])
+Temperatura = list(tVar.functions)
 # keys = list(tVar.functions.keys())
-print(Temperatura)
+# print(Temperatura)
 
 # Pressure input variable
-pVar = FuzzyVariable(name='Pre', rang=[10, 250], labels=["Escasa", "Baja", "Bien", "Fuerte", "Alta"])
-Pressure = list(pVar.functions.values())
-print(Pressure)
+pVar = FuzzyVariable(name='Pressure', rang=[10, 250], labels=["Escasa", "Baja", "Bien", "Fuerte", "Alta"])
+Pressure = list(pVar.functions)
+# print(Pressure)
 
-# Plotting the membership functions
-fig, axs = plt.subplots(2, 2)
-for i in Temperatura:
-    axs[0, 0].plot(i.x, i.y)
-axs[0, 0].set_ylim([0, 1.02])
-axs[0, 0].grid(True)
-axs[0, 0].set_title("Temperature")
-axs[0, 0].set_xlabel("Temperature")
-axs[0, 0].set_ylabel('Membership')
+aVar = FuzzyVariable(name='Action', rang=[-60, 60], labels=["NG", "NM", "NP", "CE", "PP", "PM", "PG"])
+Action = list(aVar.functions)
+# print(list(aVar.mfunctions))
 
-for i in Pressure:
-    axs[0, 1].plot(i.x, i.y)
-axs[0, 1].grid(True)
-axs[0, 1].set_ylim([0, 1.02])
-axs[0, 1].set_title("Pressure")
-axs[0, 1].set_xlabel("Pressure")
-axs[0, 1].set_ylabel('Membership')
+tVar.get_info()
+pVar.get_info()
+aVar.get_info()
 
-plt.show()
+Rules = RuleGenerator([tVar, pVar, aVar])
+antecedent, totalrule = Rules.gencomb()
+
+tVar.plotting()
+pVar.plotting()
+aVar.plotting()

@@ -29,7 +29,21 @@ class FuzzyVariable:
         self.name = name
         self.labels = labels
         self.rang = rang
-        self.functions = self.mfcreator()
+        self.dictFunctions = self.mfcreator()
+        self.functions = list(self.dictFunctions.values())
+        self.mfunctions = list(self.dictFunctions.keys())
+
+    def get_info(self):
+        print("------------------------------------------------")
+        print("Name = " + str(self.name))
+        print("Labels = " + str(self.labels))
+        print("Range = " + str(self.rang))
+        print("Functions = " + str(self.mfunctions))
+        ranList = []
+        for i in self.functions:
+            ranList.append(i.type)
+        print("Functions Type = " + str(ranList))
+        print("------------------------------------------------\n")
 
     def varcon(self):
         mfn = len(self.labels)
@@ -76,3 +90,16 @@ class FuzzyVariable:
                 namef = mf_names[i]
                 functions[namef] = f
         return functions
+
+    def plotting(self):
+        # Plotting the membership functions
+        fig, axs = plt.subplots()
+        for i in self.functions:
+            axs.plot(i.x, i.y)
+        axs.set_ylim([0, 1.02])
+        axs.grid(True)
+        axs.set_title(self.name)
+        axs.set_xlabel(self.name)
+        axs.set_ylabel('Membership')
+        axs.legend(self.mfunctions)
+        plt.show()
