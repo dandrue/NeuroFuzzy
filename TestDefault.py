@@ -17,7 +17,7 @@ def controller(tempvalue, presvalue):
     aVar = FuzzyVariable(name='Action', rang=[-60, 60], labels=["NG", "NM", "NP", "CE", "PP", "PM", "PG"])
     # Action = list(aVar.functions)
     # print(list(aVar.mfunctions))
-    variables = [tVar, pVar, aVar]
+    # variables = [tVar, pVar, aVar]
 
     # tVar.get_info()
     # pVar.get_info()
