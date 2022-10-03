@@ -80,6 +80,8 @@ for i in Presion:
 
 DicTemp = dict(zip(Temp['labels'], ActTemp))
 DicPres = dict(zip(Pres['labels'], ActPre))
+print(DicTemp)
+print(DicPres)
 
 # Se ingresan las reglas del modelo Fuzzy, utilizando un diccionario que para cada
 # etiqueta de Presión relaciona a otro diccionario en donde se relaciona finalmente
@@ -115,6 +117,8 @@ DicValIntersec = deepcopy(DicVal)
 # Se realiza un ciclo for que itera entre las keys del diccionario para generar el
 # valor de intersección, pueden utilizarse los métodos Zadeh, Mean, Larsen, mediante
 # la sintaxis Intersecciones.$Metodo$
+
+# TODO: Optimize the number of computations to obtain the final membership of input functions
 
 for i in DicVal.keys():
     for j in DicVal[i].keys():
@@ -277,6 +281,8 @@ for i in AccionDict.keys():
 
 XA = [a * b for a, b in zip(Areas, Centroides)]
 XA = sum(XA)
+print(XA)
 SA = sum(Areas)
+print(SA)
 value = round(XA/SA, 3)
 print(value)

@@ -35,4 +35,3 @@ def plotting():
     ax = fig.add_subplot(1, 2, 2, projection='3d')
     _ = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=matplotlib.cm.coolwarm, linewidth=0, antialiased=False)
     plt.show()
-

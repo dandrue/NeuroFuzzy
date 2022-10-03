@@ -36,6 +36,7 @@ class TrapAbiertaIzquierda:
         self.fin = self.param[2]
         self.altura = altura
         self.x, self.y = self.update()
+        self.ind = self.individual_contribution()
 
     def update(self):
         """ """
@@ -108,6 +109,34 @@ class TrapAbiertaIzquierda:
         x = (pertenencia + (m*fin))/m
         x = round(x, 5)
         return x
+
+    def areas(self):
+        area1 = 1 / 2 * ((self.fin - self.medio) * self.altura)
+        area2 = ((self.medio - self.inicio) * self.altura)
+        return [area1, area2]
+
+    def centroides(self):
+        centroide1 = self.medio + (1 / 3) * (self.fin - self.medio)
+        centroide2 = self.inicio + (1 / 2) * (self.medio - self.inicio)
+        return [centroide1, centroide2]
+
+    def individual_contribution(self):
+        Areas = self.areas()
+        Centroides = self.centroides()
+        # print(Areas)
+        # print(Centroides)
+        try:
+            XA = [a * b for a, b in zip(Areas, Centroides)]
+            XA = sum(XA)
+            # print(XA)
+            SA = sum(Areas)
+            # print(SA)
+            value = round(XA / SA, 3)
+            # print(value)
+        except ZeroDivisionError:
+            # print('No contribution')
+            value = None
+        return value
         
         
 class TrapAbiertaDerecha:
@@ -122,6 +151,7 @@ class TrapAbiertaDerecha:
         self.fin = self.param[2]
         self.altura = altura
         self.x, self.y = self.update()
+        self.ind = self.individual_contribution()
 
     def update(self):
         """ """
@@ -195,6 +225,34 @@ class TrapAbiertaDerecha:
         x = round(x, 5)
         return x    
 
+    def areas(self):
+        area1 = 1 / 2 * ((self.medio - self.inicio) * self.altura)
+        area2 = ((self.fin - self.medio) * self.altura)
+        return [area1, area2]
+
+    def centroides(self):
+        centroide1 = self.inicio + (2 / 3) * (self.medio - self.inicio)
+        centroide2 = self.medio + (1 / 2) * (self.fin - self.medio)
+        return [centroide1, centroide2]
+
+    def individual_contribution(self):
+        Areas = self.areas()
+        Centroides = self.centroides()
+        # print(Areas)
+        # print(Centroides)
+        try:
+            XA = [a * b for a, b in zip(Areas, Centroides)]
+            XA = sum(XA)
+            # print(XA)
+            SA = sum(Areas)
+            # print(SA)
+            value = round(XA / SA, 3)
+            # print(value)
+        except ZeroDivisionError:
+            # print('No contribution')
+            value = None
+        return value
+
 
 class Trapezoidal:
     """ """
@@ -209,6 +267,7 @@ class Trapezoidal:
         self.fin = self.param[3]
         self.altura = altura
         self.x, self.y = self.update()
+        self.ind = self.individual_contribution()
 
     def update(self):
         """ """
@@ -291,10 +350,42 @@ class Trapezoidal:
         x2 = (entry+m2*fin)/m2
         return x1, x2
 
+    def areas(self):
+        area1 = 1 / 2 * ((self.medio1 - self.inicio) * self.altura)
+        area2 = ((self.medio2 - self.medio1) * self.altura)
+        area3 = ((self.fin - self.medio2) * self.altura)
+        return [area1, area2, area3]
+    
+    def centroides(self):
+        centroide1 = self.inicio + (2 / 3) * (self.medio1 - self.inicio)
+        centroide2 = self.medio1 + (1 / 2) * (self.medio2 - self.medio1)
+        centroide3 = self.medio2 + (1 / 3) * (self.fin - self.medio2)
+        return [centroide1, centroide2, centroide3]
+
+    def individual_contribution(self):
+        Areas = self.areas()
+        Centroides = self.centroides()
+        # print(Areas)
+        # print(Centroides)
+        try:
+            XA = [a * b for a, b in zip(Areas, Centroides)]
+            XA = sum(XA)
+            # print(XA)
+            SA = sum(Areas)
+            # print(SA)
+            value = round(XA / SA, 3)
+            # print(value)
+        except ZeroDivisionError:
+            # print('No contribution')
+            value = None
+        return value
+
 
 class Triangular:
     """ """
     def __init__(self, nombre, var, param, altura=1):
+        self.medio1 = None
+        self.medio2 = None
         self.nombre = nombre
         self.var = var
         self.param = param
@@ -304,6 +395,7 @@ class Triangular:
         self.fin = self.param[2]
         self.altura = altura
         self.x, self.y = self.update()
+        self.ind = self.individual_contribution()
 
     def update(self):
         """ """
@@ -333,12 +425,12 @@ class Triangular:
 
         Parameters
         ----------
-        entry :
+        entry : Entry value, crisp value
             
 
         Returns
         -------
-
+        pertenencia : Fuzzy value, membership value  [0,1]
         """
         medio = self.medio
         fin = self.fin
@@ -363,11 +455,12 @@ class Triangular:
 
         Parameters
         ----------
-        entry :
+        entry : x value for the evaluation
             
 
         Returns
         -------
+        x1, x2 : intersection values
 
         """
         inicio = self.inicio
@@ -379,6 +472,52 @@ class Triangular:
         m2 = (altura-0)/(medio-fin)
         x2 = (entry+m2*fin)/m2
         return x1, x2
+
+    def areas(self):
+        if self.altura == 1:
+            area1 = 1 / 2 * (self.medio - self.inicio) * self.altura
+            area2 = 1 / 2 * (self.fin - self.medio) * self.altura
+            areas = [area1, area2]
+        else:
+            area1 = 1 / 2 * ((self.medio1 - self.inicio) * self.altura)
+            area2 = ((self.medio2 - self.medio1) * self.altura)
+            area3 = ((self.fin - self.medio2) * self.altura)
+            areas = [area1, area2, area3]
+        return areas
+
+    def centroides(self):
+        if self.altura == 1:
+            centroide1 = self.inicio + 2 / 3 * (self.medio - self.inicio)
+            centroide2 = self.medio + 1 / 3 * (self.fin - self.medio)
+            centroides = [centroide1, centroide2]
+        else:
+            # Centroide triangulo apuntando hacia la izquierda
+            centroide1 = self.inicio + (2 / 3) * (self.medio1 - self.inicio)
+            # Centroide rectangulo
+            centroide2 = self.medio1 + (1 / 2) * (self.medio2 - self.medio1)
+            # Centroide triangulo apuntando hacia la derecha
+            # TODO: Revisar centroide 3
+            centroide3 = self.medio2 + (1 / 3) * (self.fin - self.medio2)
+            centroides = [centroide1, centroide2, centroide3]
+        return centroides
+
+    def individual_contribution(self):
+        Areas = self.areas()
+        Centroides = self.centroides()
+        # print(Areas)
+        # print(Centroides)
+        try:
+            XA = [a * b for a, b in zip(Areas, Centroides)]
+            XA = sum(XA)
+            # print(XA)
+            SA = sum(Areas)
+            # print(SA)
+            value = round(XA / SA, 3)
+            # print(value)
+        except ZeroDivisionError:
+            # print('No contribution')
+            value = None
+        return value
 
 
 class Intersecciones:

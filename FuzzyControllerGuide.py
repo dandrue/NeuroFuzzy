@@ -1,42 +1,88 @@
 #!/usr/bin/env python3
-from DefaultStructure import *
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Mar 11 00:43:30 2021
+
+@author: diego
+"""
+# Se importan librerías
+# import numpy as np
+import matplotlib.pyplot as plt
+from FuncionesPertenencia import TrapAbiertaIzquierda, TrapAbiertaDerecha, \
+    Triangular, Trapezoidal, Intersecciones, Conorma
+from copy import deepcopy
+import seaborn as sns
+sns.set_theme()
 
 
-def controller(tempvalue, presvalue):
-    # Temperature input variable
-    tVar = FuzzyVariable(name="Temperature", rang=[100, 340], labels=["Fria", "Fresca", "Normal", "Tibia", "Caliente"])
-    # Temperatura = list(tVar.functions)
-    # keys = list(tVar.functions.keys())
-    # print(Temperatura)
+def controller(TempValue, PreValue):
+    # Se establecen las etiquetas de los conjuntos difusos para Temperatura y Presión y se agrupan en dos diccionarios
+    Temp = {'name': 'Temperatura', 'labels': ["Fria", "Fresca", "Normal", "Tibia", "Caliente"]}
+    Pres = {'name': 'Presion', 'labels': ["Escasa", "Baja", "Bien", "Fuerte", "Alta"]}
 
-    # Pressure input variable
-    pVar = FuzzyVariable(name='Pressure', rang=[10, 250], labels=["Escasa", "Baja", "Bien", "Fuerte", "Alta"])
-    # Pressure = list(pVar.functions)
-    # print(Pressure)
+    # Se definen las funciones de pertenencia de los conjuntos difusos para la temperatura
+    TempFria = TrapAbiertaIzquierda(Temp['labels'][0], Temp['name'], [100, 140, 180])
+    TempFresca = Triangular(Temp['labels'][1], Temp['name'], [140, 180, 220])
+    TempNormal = Triangular(Temp['labels'][2], Temp['name'], [180, 220, 260])
+    TempTibia = Triangular(Temp['labels'][3], Temp['name'], [220, 260, 300])
+    TempCaliente = TrapAbiertaDerecha(Temp['labels'][4], Temp['name'], [260, 300, 340])
 
-    aVar = FuzzyVariable(name='Action', rang=[-60, 60], labels=["NG", "NM", "NP", "CE", "PP", "PM", "PG"])
-    # Action = list(aVar.functions)
-    # print(list(aVar.mfunctions))
-    variables = [tVar, pVar, aVar]
+    # Se agrupan en una lista las funciones de pertenencia para la Temperatura
+    Temperatura = [TempFria, TempFresca, TempNormal, TempTibia, TempCaliente]
 
-    # tVar.get_info()
-    # pVar.get_info()
-    # aVar.get_info()
+    # fig, axs = plt.subplots(2, 2)
+    # for i in Temperatura:
+    #     axs[0, 0].plot(i.x, i.y)
+    # axs[0, 0].set_ylim([0, 1.02])
+    # axs[0, 0].grid(True)
+    # axs[0, 0].set_title("Temperature")
+    # axs[0, 0].set_xlabel("Temperature")
+    # axs[0, 0].set_ylabel('Membership')
 
-    # Rules = RuleGenerator([tVar, pVar, aVar])
-    # rules = Rules.gencomb()
-    # linrepr(rules)
-    # print(rules)
+    # Se definen las funciones de pertenencia de los conjuntos difusos para la presión
+    PreEscasa = TrapAbiertaIzquierda(Pres['labels'][0], Pres['name'], [10, 50, 90])
+    PreBaja = Triangular(Pres['labels'][1], Pres['name'], [50, 90, 130])
+    PreBien = Triangular(Pres['labels'][2], Pres['name'], [90, 130, 170])
+    PreFuerte = Triangular(Pres['labels'][3], Pres['name'], [130, 170, 210])
+    PreAlta = TrapAbiertaDerecha(Pres['labels'][4], Pres['name'], [170, 210, 250])
 
+    # Se agrupan en una lista las funciones de pertenencia para la Presión
+    Presion = [PreEscasa, PreBaja, PreBien, PreFuerte, PreAlta]
+
+    # for i in Presion:
+    #     axs[0, 1].plot(i.x, i.y)
+    # axs[0, 1].grid(True)
+    # axs[0, 1].set_ylim([0, 1.02])
+    # axs[0, 1].set_title("Preassure")
+    # axs[0, 1].set_xlabel("Preassure")
+    # axs[0, 1].set_ylabel('Membership')
+
+    # Se Realizan las entradas del sistema con valores discretos
     # TempValue = 150
-    # presValue = 80
+    # PreValue = 80
 
-    tempValues = [i.eval(tempvalue) for i in tVar.functions]
-    presValues = [i.eval(presvalue) for i in pVar.functions]
+    # Se crean dos listas vacias que almacenaran la activación correspondiente a
+    # cada función de pertenencia en temperatura y presión
+    ActTemp = []
+    ActPre = []
 
-    DicTemp = dict(zip(tVar.mfunctions, tempValues))
-    DicPres = dict(zip(pVar.mfunctions, presValues))
+    # Partiendo de que no necesariamente deben ser iguales el número de conjuntos
+    # de temp y presion se opta por separa el análisis de activación
+
+    # cada i representa una función de pertenencia, y cada función posee el método
+    # eval(param), que evalúa el valor de la función con respecto a el valor ingresado como parámetro
+
+    for i in Temperatura:
+        ActTemp.append(i.eval(TempValue))
+
+    for i in Presion:
+        ActPre.append(i.eval(PreValue))
+
+    # Se generan diccionarios que relacionan las etiquetas de los conjuntos difusos con los valores de activación
+
+    DicTemp = dict(zip(Temp['labels'], ActTemp))
     # print(DicTemp)
+    DicPres = dict(zip(Pres['labels'], ActPre))
     # print(DicPres)
 
     # Se ingresan las reglas del modelo Fuzzy, utilizando un diccionario que para cada
@@ -56,9 +102,6 @@ def controller(tempvalue, presvalue):
 
     # Se agrupan los valores de activación para cada regla del modelo y se generan listas
     # con los valores de activación len([]) = 2, ya que son solo dos entradas
-
-    # TODO: Combine DicVal and DictValIntersec, make the computations only in two loops
-
     for i in DicVal.keys():
         for j in DicVal[i].keys():
             value1 = DicPres[i]
@@ -82,8 +125,28 @@ def controller(tempvalue, presvalue):
             inter = Intersecciones.zadeh(DicValIntersec[i][j])
             DicValIntersec[i][j] = inter
     # print("DictValIntersec\n \n", DicValIntersec, "\n")
+    # Se definen las etiquetas para las funciones de salida
+    Accion = {'name': 'action', 'labels': ["NG", "NM", "NP", "CE", "PP", "PM", "PG"]}
 
-    # Salidas = aVar.functions
+    # Se definen las funciones de salida
+    AccNG = TrapAbiertaIzquierda(Accion['labels'][0], Accion['name'], [-60, -40, -20])
+    AccNM = Triangular(Accion['labels'][1], Accion['name'], [-40, -20, -10])
+    AccNP = Triangular(Accion['labels'][2], Accion['name'], [-20, -10, 10])
+    AccCE = Triangular(Accion['labels'][3], Accion['name'], [-10, 0, 10])
+    AccPP = Triangular(Accion['labels'][4], Accion['name'], [-10, 10, 20])
+    AccPM = Triangular(Accion['labels'][5], Accion['name'], [10, 20, 40])
+    AccPG = TrapAbiertaDerecha(Accion['labels'][6], Accion['name'], [20, 40, 60])
+
+    # Se agrupan en una lista las funciones de pertenencia para el accionamiento del inyector
+    Salidas = [AccNG, AccNM, AccNP, AccCE, AccPP, AccPM, AccPG]
+
+    # for i in Salidas:
+    #     axs[1, 0].plot(i.x, i.y)
+    # axs[1, 0].set_ylim([0, 1.02])
+    # axs[1, 0].grid(True)
+    # axs[1, 0].set_title("Accionamiento del Inyector (Entrada) [cm/s]")
+    # axs[1, 0].set_xlabel("Accionamiento")
+    # axs[1, 0].set_ylabel('Pertenencia')
 
     # Se generan listas vacias para cada función de salida y se agrupan en la lista SalAcc
     NG = []
@@ -94,12 +157,16 @@ def controller(tempvalue, presvalue):
     PM = []
     PG = []
     SalAcc = [NG, NM, NP, CE, PP, PM, PG]
-    DictAccSal = aVar.dictFunctions
+
+    # Se genera un diccionario que relaciona las etiquetas de las funciones de salida y las
+    # funciones de pertenencia de la salida
+    DictAccSal = dict(zip(Accion['labels'], Salidas))
+
     # print("DictAccSal\n \n", DictAccSal, "\n")
 
     # Se genera un diccionario que relaciona las etiquetas de las funciones de salida con
     # las listas vacias que se cargaran con los valores de activación en el siguiente paso
-    AccionDict = dict(zip(aVar.labels, SalAcc))
+    AccionDict = dict(zip(Accion['labels'], SalAcc))
     # print("AccionDict\n \n", AccionDict, "\n")
 
     # Mediante el ciclo for se itera dentro del diccionario que contiene las reglas difusas
@@ -126,8 +193,7 @@ def controller(tempvalue, presvalue):
         for i in AccionConorma.keys():
             if DictAccSal[i].type == "TrapAbiertaIzquierda":
                 Base = DictAccSal[i]
-                AccionDict[i] = TrapAbiertaIzquierda("TrapIzquierdaTruncada", Base.var, [Base.inicio, Base.medio,
-                                                                                         Base.fin],
+                AccionDict[i] = TrapAbiertaIzquierda("TrapIzquierdaTruncada", Base.var, [Base.inicio, Base.medio, Base.fin],
                                                      AccionConorma[i])
             elif DictAccSal[i].type == "TrapAbiertaDerecha":
                 Base = DictAccSal[i]
@@ -164,6 +230,21 @@ def controller(tempvalue, presvalue):
                 medio1, medio2 = Base.evalx(AccionConorma[i])
                 AccionDict[i] = Trapezoidal('TriangularTruncada', Base.var, [Base.inicio, medio1, medio2, Base.fin],
                                             altura=AccionConorma[i])
+
+    # for i in AccionConorma.keys():
+    #     print(AccionConorma[i])
+
+    # for i in AccionDict.keys():
+    #     axs[1, 1].fill_between(AccionDict[i].x, AccionDict[i].y, alpha=0.5)
+    # axs[1, 1].set_xlim([-60, 60])
+    # axs[1, 1].set_ylim([0, 1.02])
+    # axs[1, 1].grid(True)
+    # axs[1, 1].set_xlabel('Membership')
+    # axs[1, 1].set_ylabel('Displacement')
+    # axs[1, 1].set_title('Injector Displacement (Output) [cm/s]')
+    # fig.suptitle('MEMBERSHIP FUNCTIONS')
+    # plt.show()
+
     Areas = []
     Centroides = []
 
@@ -179,6 +260,4 @@ def controller(tempvalue, presvalue):
     # print(SA)
     value = round(XA/SA, 3)
     # print(value)
-
-    # aVar.plotting()
-    return [tempValues, presValues], value, AccionDict, AccionConorma
+    return value
