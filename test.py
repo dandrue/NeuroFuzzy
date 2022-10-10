@@ -19,10 +19,19 @@ s = bperror.sgn(o_f, o_d)
 print(E, s)
 print(activation)
 print(act_accion)
+only_act = {}
+acr = {}
 for key, val in variables.items():
     if val.ind is None:
         continue
     else:
+        print(key)
         print(val.ind)
-        print(val.centroides())
-        print(val.areas())
+        only_act[key] = act_accion[key]
+        acr[key] = val.ind
+        # print(val.centroides())
+        # print(val.areas())
+print(only_act)
+print(acr)
+
+print((o_f - acr['PM'])/rang, (o_f - acr['PG'])/rang)

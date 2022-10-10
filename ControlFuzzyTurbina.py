@@ -7,6 +7,8 @@ Created on Thu Mar 11 00:43:30 2021
 """
 # Se importan librerías
 # import numpy as np
+import time
+start = time.time()
 import matplotlib.pyplot as plt
 from FuncionesPertenencia import TrapAbiertaIzquierda, TrapAbiertaDerecha, \
     Triangular, Trapezoidal, Intersecciones, Conorma
@@ -244,7 +246,7 @@ axs[1, 1].set_xlabel('Membership')
 axs[1, 1].set_ylabel('Displacement')
 axs[1, 1].set_title('Injector Displacement (Output) [cm/s]')
 fig.suptitle('MEMBERSHIP FUNCTIONS')
-plt.show()
+# plt.show()
 
 Areas = []
 Centroides = []
@@ -286,3 +288,7 @@ SA = sum(Areas)
 print(SA)
 value = round(XA/SA, 3)
 print(value)
+
+end = time.time()
+
+print("The time of execution of above program is :", (end - start)*10**3, "ms")
