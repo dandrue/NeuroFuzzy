@@ -3,7 +3,7 @@
 """
 Created on Thu Mar 11 00:43:30 2021
 
-@author: diego
+@author: Diego A. Rueda
 """
 # Se importan librerías
 # import numpy as np

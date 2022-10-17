@@ -4,7 +4,7 @@
 
 Created on Mon Oct 10
 
-@authon: Diego A. Rueda
+@author: Diego A. Rueda
 
 """
 from typing import Dict, Union
@@ -12,20 +12,24 @@ from typing import Dict, Union
 from DefaultStructure import *
 import numpy as np
 
+theta_var = FuzzyVariable(name="Theta", rang=[0, 2*np.pi])
+theta_dot_var = FuzzyVariable(name='Theta_dot', rang=[-np.pi/4, np.pi/4])
+torque_var = FuzzyVariable(name='Torque', rang=[-3, 3])
+
 
 def controller(theta_value, theta_dot_value):
     # Temperature input variable
-    theta_var = FuzzyVariable(name="Theta", rang=[-2*np.pi, 2*np.pi])
+    # theta_var = FuzzyVariable(name="Theta", rang=[0, 2*np.pi])
     # Temperatura = list(theta_var.functions)
     # keys = list(theta_var.functions.keys())
     # print(Temperatura)
 
     # Pressure input variable
-    theta_dot_var = FuzzyVariable(name='Theta_dot', rang=[-np.pi/4, np.pi/4])
+    # theta_dot_var = FuzzyVariable(name='Theta_dot', rang=[-np.pi/4, np.pi/4])
     # Pressure = list(theta_dot_var.functions)
     # print(Pressure)
 
-    torque_var = FuzzyVariable(name='Torque', rang=[-1.5, 1.5])
+    # torque_var = FuzzyVariable(name='Torque', rang=[-3, 3])
     # Action = list(torque_var.functions)
     # print(list(torque_var.mfunctions))
     # variables = [theta_var, theta_dot_var, torque_var]
@@ -45,14 +49,8 @@ def controller(theta_value, theta_dot_value):
     theta_values = [i.eval(theta_value) for i in theta_var.functions]
     theta_dot_values = [i.eval(theta_dot_value) for i in theta_dot_var.functions]
 
-    DicTemp = dict(zip(theta_var.mfunctions, theta_values))
-    DicPres = dict(zip(theta_dot_var.mfunctions, theta_dot_values))
-    # print(DicTemp)
-    # print(DicPres)
-
-    # Se ingresan las reglas del modelo Fuzzy, utilizando un diccionario que para cada
-    # etiqueta de Presión relaciona a otro diccionario en donde se relaciona finalmente
-    # con el conjunto de salida
+    DictTheta = dict(zip(theta_var.mfunctions, theta_values))
+    DictTheta_dot = dict(zip(theta_dot_var.mfunctions, theta_dot_values))
 
     # Fuzzy Rules
     dic = {"NB": {"NB": "PB", "NM": "PB", "ZZ": "PB", "PM": "PM", "PB": "PB"},
@@ -75,8 +73,8 @@ def controller(theta_value, theta_dot_value):
     for i in DicVal.keys():
         j: str
         for j in DicVal[i].keys():
-            value1 = DicPres[i]
-            value2 = DicTemp[j]
+            value1 = DictTheta_dot[i]
+            value2 = DictTheta[j]
             DicVal[i][j] = [value1, value2]
     # print("DicVal\n \n ", DicVal, "\n")
 
@@ -192,7 +190,7 @@ def controller(theta_value, theta_dot_value):
     SA = sum(Areas)
     # print(SA)
     value = round(XA/SA, 3)
-    # print(value)
+    print(value)
 
     # torque_var.plotting()
     # return [theta_values, theta_dot_values], value, AccionDict, AccionConorma

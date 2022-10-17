@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from DefaultStructure import *
+from BackProp import *
 
 
 def controller(tempvalue, presvalue):
@@ -23,13 +24,11 @@ def controller(tempvalue, presvalue):
     # pVar.get_info()
     # aVar.get_info()
 
-    # Rules = RuleGenerator([tVar, pVar, aVar])
-    # rules = Rules.gencomb()
-    # linrepr(rules)
-    # print(rules)
-
-    # TempValue = 150
-    # presValue = 80
+    Rules = RuleGenerator([tVar, pVar, aVar])
+    rules = Rules.gencomb()
+    #linrepr(rules)
+    print(rules)
+    print(list(zip(rules)))
 
     tempValues = [i.eval(tempvalue) for i in tVar.functions]
     presValues = [i.eval(presvalue) for i in pVar.functions]
@@ -39,9 +38,9 @@ def controller(tempvalue, presvalue):
     # print(DicTemp)
     # print(DicPres)
 
-    # Se ingresan las reglas del modelo Fuzzy, utilizando un diccionario que para cada
-    # etiqueta de Presión relaciona a otro diccionario en donde se relaciona finalmente
-    # con el conjunto de salida
+    # Dictionary with the fuzzy rules
+
+    # dic = rules
 
     dic = {"Escasa": {"Fria": "PG", "Fresca": "PG", "Normal": "PM", "Tibia": "PM", "Caliente": "PP"},
            "Baja": {"Fria": "PM", "Fresca": "PM", "Normal": "PP", "Tibia": "PP", "Caliente": "PP"},
@@ -49,13 +48,9 @@ def controller(tempvalue, presvalue):
            "Fuerte": {"Fria": "NP", "Fresca": "NM", "Normal": "NP", "Tibia": "NM", "Caliente": "NG"},
            "Alta": {"Fria": "NM", "Fresca": "NM", "Normal": "NM", "Tibia": "NG", "Caliente": "NG"}}
 
-    # Se copia el diccionario de las reglas para generar un diccionario con los valores
-    # de activación siguiendo las reglas del modelo
+    # A copy of the rules dictionary is copied to store the activation values.
 
     DicVal = deepcopy(dic)
-
-    # Se agrupan los valores de activación para cada regla del modelo y se generan listas
-    # con los valores de activación len([]) = 2, ya que son solo dos entradas
 
     # TODO: Combine DicVal and DictValIntersec, make the computations only in two loops
 
@@ -64,7 +59,7 @@ def controller(tempvalue, presvalue):
             value1 = DicPres[i]
             value2 = DicTemp[j]
             DicVal[i][j] = [value1, value2]
-    # print("DicVal\n \n ", DicVal, "\n")
+    print("DicVal\n \n ", DicVal, "\n")
 
     # Se copia el diccionario anterior para generar un nuevo diccionario con el valor de
     # activación final tras la realización de la intersección
@@ -81,7 +76,7 @@ def controller(tempvalue, presvalue):
         for j in DicVal[i].keys():
             inter = Intersecciones.zadeh(DicValIntersec[i][j])
             DicValIntersec[i][j] = inter
-    # print("DictValIntersec\n \n", DicValIntersec, "\n")
+    print("DictValIntersec\n \n", DicValIntersec, "\n")
 
     # Salidas = aVar.functions
 
@@ -95,12 +90,12 @@ def controller(tempvalue, presvalue):
     PG = []
     SalAcc = [NG, NM, NP, CE, PP, PM, PG]
     DictAccSal = aVar.dictFunctions
-    # print("DictAccSal\n \n", DictAccSal, "\n")
+    print("DictAccSal\n \n", DictAccSal, "\n")
 
     # Se genera un diccionario que relaciona las etiquetas de las funciones de salida con
     # las listas vacias que se cargaran con los valores de activación en el siguiente paso
     AccionDict = dict(zip(aVar.labels, SalAcc))
-    # print("AccionDict\n \n", AccionDict, "\n")
+    print("AccionDict\n \n", AccionDict, "\n")
 
     # Mediante el ciclo for se itera dentro del diccionario que contiene las reglas difusas
     # del modelo y el diccionario que contiene el valor de activación para cada caso, los
@@ -118,7 +113,7 @@ def controller(tempvalue, presvalue):
         AccionConorma[i] = value
 
     # El diccionario AccionConorma contiene el valor de corte para cada uno de los conjuntos difusos a la salida
-    # print("AccionConorma\n \n", AccionConorma, "\n")
+    print("AccionConorma\n \n", AccionConorma, "\n")
 
     # Determinación del tipo de salida Escalado o Truncado
     Tipo = "Truncado"
@@ -178,7 +173,11 @@ def controller(tempvalue, presvalue):
     SA = sum(Areas)
     # print(SA)
     value = round(XA/SA, 3)
-    # print(value)
+    print(value)
 
-    # aVar.plotting()
+    tVar.plotting()
+    pVar.plotting()
+    aVar.plotting()
     return [tempValues, presValues], value, AccionDict, AccionConorma
+
+controller(150, 80)
