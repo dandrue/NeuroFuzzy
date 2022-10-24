@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import time
-start = time.time()
 from DefaultStructure import *
 from BackProp import *
 
+start = time.time()
 tVar = FuzzyVariable(name="Temperature", rang=[100, 340], labels=["Fria", "Fresca", "Normal", "Tibia", "Caliente"])
 pVar = FuzzyVariable(name='Pressure', rang=[10, 250], labels=["Escasa", "Baja", "Bien", "Fuerte", "Alta"])
 aVar = FuzzyVariable(name='Action', rang=[-60, 60], labels=["NG", "NM", "NP", "CE", "PP", "PM", "PG"])
@@ -128,9 +128,11 @@ def controller(tempvalue, presvalue, objective):
 
     # TODO modificar las reglas para iniciar la depuración
 
-def getrule(ind, ruleslist, rulesc):
+def getrule(ind, ruleslist, rulesc, ex):
     power = len(ruleslist)
     base = len(aVar.labels)
+    for i in range(power):
+        val = ind
 
     pass
 
