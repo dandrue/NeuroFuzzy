@@ -7,14 +7,11 @@ start = time.time()
 tVar = FuzzyVariable(name="Temperature", rang=[100, 340], labels=["Fria", "Fresca", "Normal", "Tibia", "Caliente"])
 pVar = FuzzyVariable(name='Pressure', rang=[10, 250], labels=["Escasa", "Baja", "Bien", "Fuerte", "Alta"])
 aVar = FuzzyVariable(name='Action', rang=[-60, 60], labels=["NG", "NM", "NP", "CE", "PP", "PM", "PG"])
-
+Rules = RuleGenerator([pVar, tVar, aVar])
+rules = Rules.gencomb()
+print(rules)
 
 def controller(tempvalue, presvalue, objective):
-
-    Rules = RuleGenerator([pVar, tVar, aVar])
-    rules = Rules.gencomb()
-    print(rules)
-
     # rules = {"Escasa": {"Fria": "PG", "Fresca": "PG", "Normal": "PM", "Tibia": "PM", "Caliente": "PP"},
     #        "Baja": {"Fria": "PM", "Fresca": "PM", "Normal": "PP", "Tibia": "PP", "Caliente": "PP"},
     #        "Bien": {"Fria": "PP", "Fresca": "CE", "Normal": "CE", "Tibia": "NP", "Caliente": "NM"},
@@ -96,7 +93,7 @@ def controller(tempvalue, presvalue, objective):
             for k in range(len(ruleslist[2])):
                 for m in range(len(ruleslist[3])):
                     Acc = deepcopy(AccionDict)
-                    print(ex[i], ex[j], ex[k], ex[m])
+                    # print(ex[i], ex[j], ex[k], ex[m])
                     Acc[ex[i]].append(ruleslist[0][i])
                     Acc[ex[j]].append(ruleslist[1][j])
                     Acc[ex[k]].append(ruleslist[2][k])
@@ -116,39 +113,71 @@ def controller(tempvalue, presvalue, objective):
                     totalError.append(totError)
                     # print('Entry 1', entry1)
                     # totalValue.append(tcon)
-                    print('Ciclo ', counter, " Finalizado")
-                    print(totError)
+                    # print('Ciclo ', counter, " Finalizado")
+                    # print(totError)
                     # print("Acc 2", Acc)
 
     # print(totalError)
     # print(len(totalError))
+    # plt.plot(totalError)
+    # plt.xlabel("Combination")
+    # plt.ylabel("Total Error")
+    # plt.show()
+    # sns.histplot(totalError)
+    # plt.xlabel('Combination')
+    # plt.ylabel('Total Error')
+    # plt.show()
+    print("media", np.mean(totalError))
     print(min(totalError))
     print(max(totalError))
-    getrule(1550, ruleslist, rulesc, ex)
+    rulesl = deepcopy(rulesc)
 
+    for i in rulesl.keys():
+        for j in rulesl[i].keys():
+            rulesl[i][j] = []
+    c = 0
+    for i in range(len(totalError)):
+        # print(i)
 
+        # if i <= np.mean(totalError):
+        if totalError[i] <= 0.1:
+            rulesl = getrule(i, ruleslist, rulesl, ex)
+            c += 1
+    print(c)
+    print(rulesl)
+    print(rules)
+    for i in rulesl.keys():
+        # print(i)
+        for j in rulesl[i].keys():
+            # print(j)
+            rules[i][j] = []
+            rules[i][j] = rulesl[i][j]
+
+    print(rules)
 
     # TODO modificar las reglas para iniciar la depuración
 
-def getrule(ind, ruleslist, rulesc, ex):
+def getrule(ind, ruleslist, rulesl, ex):
     power = len(ruleslist)
     base = len(aVar.labels)
     cons = []
     for i in range(power-1, -1, -1):
-        print(i)
+        # print(i)
         val = ind/base**i
         val = int(np.ceil(val))-1
         cons.append(ex[val])
         ind = ind % base**i
-    print(cons)
-    print(rulesc)
+    # print(cons)
+    # print(rulesl)
     counter = 0
-    for i in rulesc.keys():
-        for j in rulesc[i].keys():
-            rulesc[i][j] = cons[counter]
+    for i in rulesl.keys():
+        for j in rulesl[i].keys():
+            if cons[counter] not in rulesl[i][j]:
+                rulesl[i][j].append(cons[counter])
             counter += 1
 
-    print(rulesc)
+    # print(rulesl)
+    return rulesl
 
 def totalc(AccionDict, DictAccSal, objective):
     # print('total contribution')
