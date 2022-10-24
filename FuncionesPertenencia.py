@@ -604,7 +604,10 @@ class Conorma:
         -------
 
         """
-        value = max(lista)
+        try:
+            value = max(lista)
+        except ValueError:
+            value = 0
         return value
 
     @staticmethod

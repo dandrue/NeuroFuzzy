@@ -93,6 +93,7 @@ class FuzzyVariable:
         start = rang[0]
         end = rang[1]
         rng = end - start
+        self.rng = rng
         increment = rng / secn
         rangs = []
         start_range = start

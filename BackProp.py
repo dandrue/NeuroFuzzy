@@ -2,7 +2,7 @@ import numpy as np
 
 
 def combination(list_1, list_2, list_3):
-    c = {key: set(list_3) for key in list_2}
+    c = {key: list_3 for key in list_2}
     rules = {key: c for key in list_1}
     return rules
 
@@ -32,6 +32,7 @@ class RuleGenerator:
     def gencomb(self):
         mfs = []
         for i in self.variables:
+            # print(i.mfunctions)
             mfs.append(i.mfunctions)
         rules = combination(mfs[0], mfs[1], mfs[2])
         return rules

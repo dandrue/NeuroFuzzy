@@ -104,7 +104,7 @@ def controller(tempvalue, presvalue):
         for j in dic[i].keys():
             value = dic[i][j]
             AccionDict[value].append(DicValIntersec[i][j])
-    # print("AccionDict\n \n", AccionDict, "\n")
+    print("AccionDict\n \n", AccionDict, "\n")
     # Se copia el diccionario ActionDict y se genera el calculo de la conorma sobre la
     # lista de activaciones para cada conjunto de salida. Los metodos para la conorma son Max y Sum
     AccionConorma = deepcopy(AccionDict)
