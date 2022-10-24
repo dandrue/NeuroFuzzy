@@ -85,7 +85,9 @@ def controller(tempvalue, presvalue, objective):
     print("rules c\n \n", rulesc, "\n")
     print(ruleslist)
     counter = 0
-    ex = rules['Escasa']['Fria']
+    # ex es una ejemplo de las posibles funciones de pertenencia a la salida
+    ex = aVar.labels
+    print('ex', ex)
     totalComb = []
     totalValue = []
     totalError = []
@@ -94,6 +96,7 @@ def controller(tempvalue, presvalue, objective):
             for k in range(len(ruleslist[2])):
                 for m in range(len(ruleslist[3])):
                     Acc = deepcopy(AccionDict)
+                    print(ex[i], ex[j], ex[k], ex[m])
                     Acc[ex[i]].append(ruleslist[0][i])
                     Acc[ex[j]].append(ruleslist[1][j])
                     Acc[ex[k]].append(ruleslist[2][k])
@@ -122,9 +125,14 @@ def controller(tempvalue, presvalue, objective):
     print(min(totalError))
     print(max(totalError))
 
+
     # TODO modificar las reglas para iniciar la depuración
 
+def getrule(ind, ruleslist, rulesc):
+    power = len(ruleslist)
+    base = len(aVar.labels)
 
+    pass
 
 def totalc(AccionDict, DictAccSal, objective):
     # print('total contribution')
