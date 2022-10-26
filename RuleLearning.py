@@ -2,6 +2,7 @@
 import time
 from DefaultStructure import *
 from BackProp import *
+from multiprocessing import Pool
 
 start = time.time()
 tVar = FuzzyVariable(name="Temperature", rang=[100, 340], labels=["Fria", "Fresca", "Normal", "Tibia", "Caliente"])
@@ -9,7 +10,7 @@ pVar = FuzzyVariable(name='Pressure', rang=[10, 250], labels=["Escasa", "Baja", 
 aVar = FuzzyVariable(name='Action', rang=[-60, 60], labels=["NG", "NM", "NP", "CE", "PP", "PM", "PG"])
 Rules = RuleGenerator([pVar, tVar, aVar])
 rules = Rules.gencomb()
-print(rules)
+# print(rules)
 
 def controller(tempvalue, presvalue, objective):
     # rules = {"Escasa": {"Fria": "PG", "Fresca": "PG", "Normal": "PM", "Tibia": "PM", "Caliente": "PP"},
@@ -26,8 +27,8 @@ def controller(tempvalue, presvalue, objective):
     DicTemp = dict(zip(tVar.mfunctions, tempValues))
     DicPres = dict(zip(pVar.mfunctions, presValues))
 
-    print(DicTemp)
-    print(DicPres)
+    # print(DicTemp)
+    # print(DicPres)
 
     DicVal = deepcopy(rules)
 
@@ -39,7 +40,7 @@ def controller(tempvalue, presvalue, objective):
             value2 = DicTemp[j]
             tempdic[j] = [value1, value2]
         DicVal[i] = tempdic
-    print("DicVal\n \n ", DicVal, "\n")
+    # print("DicVal\n \n ", DicVal, "\n")
 
     DicValIntersec = deepcopy(DicVal)
     # print(DicValIntersec)
@@ -48,7 +49,7 @@ def controller(tempvalue, presvalue, objective):
         for j in DicVal[i].keys():
             inter = Intersecciones.zadeh(DicValIntersec[i][j])
             DicValIntersec[i][j] = inter
-    print("DictValIntersec\n \n", DicValIntersec, "\n")
+    # print("DictValIntersec\n \n", DicValIntersec, "\n")
 
     # Dejando unicamente las reglas que se activan
     for i in DicValIntersec.copy():
@@ -56,7 +57,7 @@ def controller(tempvalue, presvalue, objective):
         if not DicValIntersec[i]:
             DicValIntersec.pop(i)
 
-    print("New \n", DicValIntersec)
+    # print("New \n", DicValIntersec)
 
     NG = []
     NM = []
@@ -67,10 +68,10 @@ def controller(tempvalue, presvalue, objective):
     PG = []
     SalAcc = [NG, NM, NP, CE, PP, PM, PG]
     DictAccSal = aVar.dictFunctions
-    print("DictAccSal\n \n", DictAccSal, "\n")
+    # print("DictAccSal\n \n", DictAccSal, "\n")
 
     AccionDict = dict(zip(aVar.labels, SalAcc))
-    print("AccionDict\n \n", AccionDict, "\n")
+    # print("AccionDict\n \n", AccionDict, "\n")
 
     rulesc = deepcopy(DicValIntersec)
     ruleslist = []
@@ -79,12 +80,12 @@ def controller(tempvalue, presvalue, objective):
         for j in DicValIntersec[i].keys():
             rulesc[i][j] = [DicValIntersec[i][j]] * 7
             ruleslist.append([DicValIntersec[i][j]] * 7)
-    print("rules c\n \n", rulesc, "\n")
-    print(ruleslist)
+    # print("rules c\n \n", rulesc, "\n")
+    # print(ruleslist)
     counter = 0
     # ex es una ejemplo de las posibles funciones de pertenencia a la salida
     ex = aVar.labels
-    print('ex', ex)
+    # print('ex', ex)
     totalComb = []
     totalValue = []
     totalError = []
@@ -119,17 +120,7 @@ def controller(tempvalue, presvalue, objective):
 
     # print(totalError)
     # print(len(totalError))
-    # plt.plot(totalError)
-    # plt.xlabel("Combination")
-    # plt.ylabel("Total Error")
-    # plt.show()
-    # sns.histplot(totalError)
-    # plt.xlabel('Combination')
-    # plt.ylabel('Total Error')
-    # plt.show()
-    print("media", np.mean(totalError))
-    print(min(totalError))
-    print(max(totalError))
+    # plotting(totalError)
     rulesl = deepcopy(rulesc)
 
     for i in rulesl.keys():
@@ -138,24 +129,60 @@ def controller(tempvalue, presvalue, objective):
     c = 0
     for i in range(len(totalError)):
         # print(i)
-
-        # if i <= np.mean(totalError):
-        if totalError[i] <= 0.1:
+        if totalError[i] <= np.quantile(totalError, 0.25):
+        # if totalError[i] <= np.mean(totalError):
+        # if totalError[i] <= 0.1:
             rulesl = getrule(i, ruleslist, rulesl, ex)
             c += 1
-    print(c)
-    print(rulesl)
-    print(rules)
+    # print(c)
+    # print(rulesl)
+    # print(rules)
+
     for i in rulesl.keys():
-        # print(i)
+        temp = deepcopy(rules[i])
         for j in rulesl[i].keys():
-            # print(j)
-            rules[i][j] = []
-            rules[i][j] = rulesl[i][j]
+            # print(rules[i][j])
+            temp[j] = rulesl[i][j]
+        rules[i] = temp
 
+    # print(rulesl)
     print(rules)
 
-    # TODO modificar las reglas para iniciar la depuración
+
+def plotting(totalError):
+    fig, axs = plt.subplots(2, 2)
+    fig.suptitle('Error distribution analysis')
+
+    sns.lineplot(ax=axs[0, 0], x=range(len(totalError)), y=totalError)
+    axs[0, 0].set_title("Total Error Lineplot")
+    axs[0, 0].set_xlabel("Combination")
+    axs[0, 0].set_ylabel("Total Error")
+
+    sns.histplot(ax=axs[0, 1], x=totalError, kde=True)
+    axs[0, 1].axvline(x=np.mean(totalError), color='b', label='Mean Error')
+    axs[0, 1].axvline(x=np.quantile(totalError, [0.25]), color='g', label='First Quantile')
+    axs[0, 1].set_title("Total Error Distribution")
+    axs[0, 1].set_xlabel("Combination")
+    axs[0, 1].set_ylabel("Total Error")
+    axs[0, 1].legend(bbox_to_anchor=(1.0, 1), loc='best')
+
+    sns.boxplot(ax=axs[1, 0], y=totalError)
+    axs[1, 0].set_title("Total Error Boxplot")
+    axs[1, 0].set_xlabel("Array")
+    axs[1, 0].set_ylabel("Total Error")
+
+    sns.violinplot(ax=axs[1, 1], y=totalError)
+    axs[1, 1].set_title("Total Error Violinplot")
+    axs[1, 1].set_xlabel("Array")
+    axs[1, 1].set_ylabel("Total Error")
+
+    print("1st Quantile", np.quantile(totalError, [0.25]))
+    print("media", np.mean(totalError))
+    print(min(totalError))
+    print(max(totalError))
+
+    plt.show()
+
 
 def getrule(ind, ruleslist, rulesl, ex):
     power = len(ruleslist)
