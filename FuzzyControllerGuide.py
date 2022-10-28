@@ -91,10 +91,10 @@ def controller(TempValue, PreValue):
     # con el conjunto de salida
 
     dic = {"Escasa": {"Fria": "PG", "Fresca": "PG", "Normal": "PM", "Tibia": "PM", "Caliente": "PP"},
-           "Baja": {"Fria": "PM", "Fresca": "PM", "Normal": "PP", "Tibia": "PP", "Caliente": "PP"},
-           "Bien": {"Fria": "PP", "Fresca": "CE", "Normal": "CE", "Tibia": "NP", "Caliente": "NM"},
+           "Baja":   {"Fria": "PM", "Fresca": "PM", "Normal": "PP", "Tibia": "PP", "Caliente": "PP"},
+           "Bien":   {"Fria": "PP", "Fresca": "CE", "Normal": "CE", "Tibia": "NP", "Caliente": "NM"},
            "Fuerte": {"Fria": "NP", "Fresca": "NM", "Normal": "NP", "Tibia": "NM", "Caliente": "NG"},
-           "Alta": {"Fria": "NM", "Fresca": "NM", "Normal": "NM", "Tibia": "NG", "Caliente": "NG"}}
+           "Alta":   {"Fria": "NM", "Fresca": "NM", "Normal": "NM", "Tibia": "NG", "Caliente": "NG"}}
 
     # Se copia el diccionario de las reglas para generar un diccionario con los valores
     # de activación siguiendo las reglas del modelo
@@ -244,7 +244,7 @@ def controller(TempValue, PreValue):
     # axs[1, 1].set_ylabel('Displacement')
     # axs[1, 1].set_title('Injector Displacement (Output) [cm/s]')
     # fig.suptitle('MEMBERSHIP FUNCTIONS')
-    # plt.show()
+    # # plt.show()
 
     Areas = []
     Centroides = []
@@ -262,3 +262,5 @@ def controller(TempValue, PreValue):
     value = round(XA/SA, 3)
     # print(value)
     return value
+
+# print(controller(340, 250))

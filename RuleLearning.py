@@ -111,7 +111,7 @@ def controller(tempvalue, presvalue, objective):
                                 totError = tcon
                                 totalError.append(totError)
                         except IndexError:
-                            if tot <=175:
+                            if tot <=100:
                                 Acc = deepcopy(AccionDict)
                                 Acc[ex[i]].append(ruleslist[0][i])
                                 Acc[ex[j]].append(ruleslist[1][j])
@@ -127,7 +127,7 @@ def controller(tempvalue, presvalue, objective):
                             else:
                                 pass
                 except IndexError:
-                    if tot <=175:
+                    if tot <=75:
                         Acc = deepcopy(AccionDict)
                         Acc[ex[i]].append(ruleslist[0][i])
                         Acc[ex[j]].append(ruleslist[1][j])
@@ -142,7 +142,7 @@ def controller(tempvalue, presvalue, objective):
                     else:
                         pass
         except IndexError:
-            if tot <= 175:
+            if tot <= 50:
                 Acc = deepcopy(AccionDict)
                 Acc[ex[i]].append(ruleslist[0][i])
                 counter += 1
@@ -165,8 +165,7 @@ def controller(tempvalue, presvalue, objective):
         for j in rulesl[i].keys():
             rulesl[i][j] = []
     c = 0
-
-
+    # TODO use sets to sort the total errors and loop to select the correct rules
 
     for i in range(len(totalError)):
         # print(i)
@@ -174,12 +173,13 @@ def controller(tempvalue, presvalue, objective):
         # if totalError[i] <= 0.1:
         objlist = [objective] * len(cError)
         rui = [np.abs(e1 - e2) for e1, e2 in zip(objlist, cError)]
-        if np.sign(cError[i]) == np.sign(objective): # and np.abs(cError[i]-objective) <= np.quantile(rui, 0.05):
+        print(zip(objlist, cError))
+        if np.sign(cError[i]) == np.sign(objective) and np.abs(cError[i]-objective) <= np.quantile(rui, 0.25):
             oblist = [objective] * len(pError[i])
             res = [np.abs(e1 - e2) for e1, e2 in zip(oblist, pError[i])]
             for j in pError[i]:
-                if np.sign(j) == np.sign(objective): # and np.abs(j-objective) <= np.quantile(rui, 0.025):
-                    print(j, objective)
+                if np.sign(j) == np.sign(objective) and np.abs(j-objective) <= np.quantile(res, 0.25):
+                    # print(j, objective)
                     # print("change")
                     rulesl = getrule(i, ruleslist, rulesl, ex)
                     c += 1
@@ -415,8 +415,8 @@ def partialc(AccionDict, DictAccSal, objective):
             Centroides.extend(Base.centroides())
 
     perror = []
-    for i in Centroides:
-        perror.append(i)
+    for i in range(len(Centroides)):
+        perror.append(Centroides[i])
 
     return perror
 
@@ -438,11 +438,17 @@ def outerLoop():
     rul = deepcopy(rules)
     tRange = tVar.rang
     pRange = pVar.rang
-    while probe() != True:
+    # print(tRange, pRange)
+    # while probe() != True:
+    global cont
+    for cont in range(1000):
         tempValues = np.random.uniform(tRange[0], tRange[1])
         presValues = np.random.uniform(pRange[0], pRange[1])
         actionValues = FCG.controller(tempValues, presValues)
         controller(tempValues, presValues, actionValues)
+        probe()
+        print(cont)
+        cont += 1
     print(rul)
     print(rules)
 
@@ -467,16 +473,25 @@ def outerloop(samples):
 
 if __name__ == '__main__':
     start = time.time()
-    global tot
+    global tot, pos
     tot = 175
+    pos = 175
     tVar = FuzzyVariable(name="Temperature", rang=[100, 340], labels=["Fria", "Fresca", "Normal", "Tibia", "Caliente"])
     pVar = FuzzyVariable(name='Pressure', rang=[10, 250], labels=["Escasa", "Baja", "Bien", "Fuerte", "Alta"])
     aVar = FuzzyVariable(name='Action', rang=[-60, 60], labels=["NG", "NM", "NP", "CE", "PP", "PM", "PG"])
+    # print(tVar.rang)
+    # print(pVar.rang)
+    # print(aVar.rang)
+    # tVar.plotting()
+    # pVar.plotting()
+    # aVar.plotting()
+
     Rules = RuleGenerator([pVar, tVar, aVar])
     rules = Rules.gencomb()
     # print(rules)
     # rules = {'Escasa': {'Fria': ['PM', 'PG'], 'Fresca': ['PM', 'PG'], 'Normal': ['PP', 'PM', 'PG'], 'Tibia': ['PP', 'PM', 'PG'], 'Caliente': ['CE', 'PP', 'NP']}, 'Baja': {'Fria': ['PP', 'PM', 'PG'], 'Fresca': ['PP', 'PM'], 'Normal': ['CE', 'PP'], 'Tibia': ['CE', 'NP'], 'Caliente': ['CE', 'PP', 'NP']}, 'Bien': {'Fria': ['CE', 'PP', 'NP'], 'Fresca': ['CE', 'NP'], 'Normal': ['CE', 'NP'], 'Tibia': ['NP', 'NM'], 'Caliente': ['NP', 'NM', 'NG']}, 'Fuerte': {'Fria': ['NM', 'NP', 'CE'], 'Fresca': ['NG', 'NM', 'NP'], 'Normal': ['NM', 'NP'], 'Tibia': ['NG', 'NM', 'NP'], 'Caliente': ['NG', 'PG']}, 'Alta': {'Fria': ['NG', 'NM', 'NP'], 'Fresca': ['NG', 'NM'], 'Normal': ['PG', 'NG', 'NM', 'NP'], 'Tibia': ['PG', 'NG'], 'Caliente': ['PG', 'NG', 'NM', 'NP']}}
     outerLoop()
+
     end = time.time()
 
     print("The execution time is :", (end - start)*10**3, "ms")

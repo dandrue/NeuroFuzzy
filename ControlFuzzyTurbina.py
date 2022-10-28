@@ -22,9 +22,11 @@ Pres = {'name': 'Presion', 'labels': ["Escasa", "Baja", "Bien", "Fuerte", "Alta"
 
 # Se definen las funciones de pertenencia de los conjuntos difusos para la temperatura
 TempFria = TrapAbiertaIzquierda(Temp['labels'][0], Temp['name'], [100, 140, 180])
+# TempFria = Triangular(Temp['labels'][0], Temp['name'], [100, 140, 180])
 TempFresca = Triangular(Temp['labels'][1], Temp['name'], [140, 180, 220])
 TempNormal = Triangular(Temp['labels'][2], Temp['name'], [180, 220, 260])
 TempTibia = Triangular(Temp['labels'][3], Temp['name'], [220, 260, 300])
+# TempCaliente = Triangular(Temp['labels'][4], Temp['name'], [260, 300, 340])
 TempCaliente = TrapAbiertaDerecha(Temp['labels'][4], Temp['name'], [260, 300, 340])
 
 # Se agrupan en una lista las funciones de pertenencia para la Temperatura
@@ -57,8 +59,8 @@ axs[0, 1].set_xlabel("Preassure")
 axs[0, 1].set_ylabel('Membership')
 
 # Se Realizan las entradas del sistema con valores discretos
-TempValue = 150
-PreValue = 80
+TempValue = 320
+PreValue = 220
 
 # Se crean dos listas vacias que almacenaran la activación correspondiente a
 # cada función de pertenencia en temperatura y presión
@@ -132,11 +134,13 @@ Accion = {'name': 'action', 'labels': ["NG", "NM", "NP", "CE", "PP", "PM", "PG"]
 
 # Se definen las funciones de salida
 AccNG = TrapAbiertaIzquierda(Accion['labels'][0], Accion['name'], [-60, -40, -20])
+# AccNG = Triangular(Accion['labels'][0], Accion['name'], [-60, -59, -20])
 AccNM = Triangular(Accion['labels'][1], Accion['name'], [-40, -20, -10])
 AccNP = Triangular(Accion['labels'][2], Accion['name'], [-20, -10, 10])
 AccCE = Triangular(Accion['labels'][3], Accion['name'], [-10, 0, 10])
 AccPP = Triangular(Accion['labels'][4], Accion['name'], [-10, 10, 20])
 AccPM = Triangular(Accion['labels'][5], Accion['name'], [10, 20, 40])
+# AccPG = Triangular(Accion['labels'][6], Accion['name'], [20, 59, 60])
 AccPG = TrapAbiertaDerecha(Accion['labels'][6], Accion['name'], [20, 40, 60])
 
 # Se agrupan en una lista las funciones de pertenencia para el accionamiento del inyector
@@ -246,7 +250,7 @@ axs[1, 1].set_xlabel('Membership')
 axs[1, 1].set_ylabel('Displacement')
 axs[1, 1].set_title('Injector Displacement (Output) [cm/s]')
 fig.suptitle('MEMBERSHIP FUNCTIONS')
-# plt.show()
+plt.show()
 
 Areas = []
 Centroides = []
