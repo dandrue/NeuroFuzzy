@@ -1,9 +1,12 @@
 import numpy as np
 
 
-def combination(list_1, list_2, list_3):
-    c = {key: list(list_3) for key in list_2}
-    rules = {key: c for key in list_1}
+def combination(var):
+    if len(var) == 2:
+        rules = {key: list(var[1]) for key in var[0]}
+    else:
+        c = {key: list(var[2]) for key in var[1]}
+        rules = {key: c for key in var[0]}
     return rules
 
 
@@ -34,7 +37,8 @@ class RuleGenerator:
         for i in self.variables:
             # print(i.mfunctions)
             mfs.append(i.mfunctions)
-        rules = combination(mfs[0], mfs[1], mfs[2])
+        # rules = combination(mfs[0], mfs[1], mfs[2])
+        rules = combination(mfs)
         return rules
 
 

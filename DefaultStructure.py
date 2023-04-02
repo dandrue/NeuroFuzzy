@@ -137,6 +137,7 @@ class FuzzyVariable:
         # Plotting the membership functions
         fig, axs = plt.subplots()
         for i in self.functions:
+            print(i, i.x, i.y)
             axs.fill_between(i.x, i.y, alpha=0.25)
         axs.set_ylim([0, 1.02])
         axs.grid(True)
